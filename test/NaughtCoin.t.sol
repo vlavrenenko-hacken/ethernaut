@@ -17,7 +17,7 @@ contract NaughtCoinTest is Test {
     }
 
     function testHack() external {
-        ncoin.approve(BOB, uint(-1));
+        ncoin.approve(BOB, ~uint(0));
         vm.stopPrank();
 
         vm.startPrank(BOB);
