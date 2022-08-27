@@ -13,7 +13,7 @@ import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
   uint256 public INITIAL_SUPPLY;
   address public player;
 
-  constructor(address _player) 
+  constructor(address _player)
   ERC20('NaughtCoin', '0x0')
   public {
     player = _player;
