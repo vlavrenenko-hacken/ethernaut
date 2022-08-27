@@ -7,9 +7,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "remap":"forge remappings > remappings.txt",
-    "test":"hh test ; forge test",
-    "clean":"forge clean ; hh clean"
+    "remap": "forge remappings > remappings.txt",
+    "test": "hh test ; forge test",
+    "clean": "forge clean ; hh clean"
   },
   "repository": {
     "type": "git",
