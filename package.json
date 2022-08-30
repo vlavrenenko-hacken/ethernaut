@@ -22,9 +22,9 @@
   },
   "homepage": "https://github.com/vvlnko/foundry_hardhat_template#readme",
   "dependencies": {
-    "@openzeppelin/contracts": "^4.7.3",
     "hardhat": "^2.10.2",
     "hardhat-preprocessor": "^0.1.4",
+    "hardhat-shorthand": "^1.0.0",
     "npm-check-updates": "^16.0.5"
   },
   "devDependencies": {
