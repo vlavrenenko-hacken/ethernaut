@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.13;
+pragma solidity ^0.6.0;
 import "forge-std/console.sol";
 
-// import '@openzeppelin/contracts/math/SafeMath.sol';
+import 'https://github.com/OpenZeppelin/openzeppelin-contracts/blob/release-v3.0.0/contracts/math/SafeMath.sol';
 
 contract Reentrance {
   
@@ -19,11 +19,11 @@ contract Reentrance {
 
   function withdraw(uint _amount) public {
     if(balances[msg.sender] >= _amount) {
-      (bool result,) = msg.sender.call{value:_amount}("");
-      require(result, "tx failed");
-    //   if(result) {
-    //     _amount;
-    //   }
+      (bool result,) = msg.sender.call.value(_amount)("");
+      if(result) {
+        _amount;
+      }
+      console.log(balances[msg.sender]);
       balances[msg.sender] -= _amount;
     }
   }
