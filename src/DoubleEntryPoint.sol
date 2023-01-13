@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.13;
+pragma solidity ^0.6.0;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "hardhat/console.sol";
 
 interface DelegateERC20 {
   function delegateTransfer(address to, uint256 value, address origSender) external returns (bool);
@@ -44,11 +45,11 @@ contract CryptoVault {
     address public sweptTokensRecipient;
     IERC20 public underlying;
 
-    constructor(address recipient) {
+    constructor(address recipient) public {
         sweptTokensRecipient = recipient;
     }
 
-    function setUnderlying(address latestToken) external {
+    function setUnderlying(address latestToken) public {
         require(address(underlying) == address(0), "Already set");
         underlying = IERC20(latestToken);
     }
@@ -128,13 +129,30 @@ contract DoubleEntryPoint is ERC20("DoubleEntryPointToken", "DET"), DelegateERC2
     }
 }
 
-// CryptoVault: underlying token can't be swept
-// The underlying token is an instance of the DET token implemented in DoubleEntryPoint contract definition 
-// CryptoVault holds 100 of it
-// Additionally the CryptoVault also holds 100 of LegacyToken LGT
-// WHERE the bug is in CryptoVault and protect it from being drained out of tokens ??????????
+// // CryptoVault: underlying token can't be swept
+// // The underlying token is an instance of the DET token implemented in DoubleEntryPoint contract definition 
+// // CryptoVault holds 100 of it
+// // Additionally the CryptoVault also holds 100 of LegacyToken LGT
+// // WHERE the bug is in CryptoVault and protect it from being drained out of tokens ??????????
 
-// TASK!!!
+// // TASK!!!
 //Your job is to implement a detection bot and register it in the Forta contract. The bot's implementation will need to raise correct alerts to prevent potential attacks or bug exploits.
 // Things that might help:
 // How does a double entry point work for a token contract ?
+
+contract DetectionBot is IDetectionBot {
+    Forta private forta;
+    address private cryptoVault;
+
+    constructor(address _cryptoVault) public {
+        cryptoVault = _cryptoVault;
+    }
+
+    function handleTransaction(address user, bytes calldata msgData) external override {
+        (address to, uint256 value, address origSender) = abi.decode(msgData[4:], (address, uint256, address));
+
+        if(keccak256(abi.encodePacked((msgData[:4]))) == keccak256(abi.encodePacked(DoubleEntryPoint.delegateTransfer.selector)) && (origSender == cryptoVault )) {
+            IForta(msg.sender).raiseAlert(user);
+        }
+    }
+} 
